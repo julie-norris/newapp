@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Page Title</title>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script>
+		$(document).ready(function(){
+			$("button").click(function(){
+			var value = $("#name").val();
+  			$("#new").text("Hello " + value + "!!");
+			});
+  		})
+	</script>
+</head>
+<body>
+	{% extends "template.html" %}
+    {% block content %}
+
+	<h2> Thanks for Visiting!</h2>
+	<form id="form1" action = "http://localhost:5000/" method = "POST">
+         <p id="fname">Enter your name: </p>
+		 <input id="name" type = "text" value="name">
+	
+		 <h2 id="new"></h2>
+	</form>
+	<button>Submit</button>
+	
+	{% endblock %}
+</body>
+</html>
