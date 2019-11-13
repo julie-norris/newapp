@@ -10,96 +10,133 @@ table, th, td {
 </style>
 	
 </head>
-
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript" language="javascript">
+	// builds a table as a student name is input 
+	function UpdateStuInHtml (data){
+		console.log(data);
+		$.each(data, function(i, field) {
+             $("#students").append("<tr><td>" + field['STUDENT_NUMBER'] + "</td><td>" + field['FIRST_NAME'] + "</td><td>" + field['LAST_NAME'] +"</td><td>" + new Date(field['DOB']).toDateString() + "</td><td>" + field['SCHOOLID'] + "</td></tr>");
+		});
+	}		
 	
-
+	function UploadFile(event){
+		event.preventDefault();
+		var form_data = new FormData($('#form1')[0]);
+        $.ajax({
+            type: 'POST',
+            url: '/userupload',
+            data: form_data,
+            contentType: false,
+            cache: false,
+            processData: false,
+            success: function(data) {
+				console.log('Success!');
+			}
+		}); 
+	}
 	
+	// Method that reads and processes the selected file
+  //  function FranklinFileUpload(event) {
+	//	event.preventDefault();
+		//var form_data = new FormData($('#MFIFform')[0]);
+        //$.ajax({
+          //  type: 'POST',
+          //  processData: false,
+          //  url: '/missingapplication',
+          //  data: form_data,
+          //  contentType: false,
+          // cache: false,
+          //  processData: false,
+          //  success: function(data) {
+		//		console.log('Success!');
+		//	}
+	//	}); 
+//	} 
+            
+
+	$SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+	
+	//this is called when page is loaded	
+	$(document).ready(function(){
+		//user clicks submit this function finds the student in the database
+		$("#StudentLookup").click(function(event){
+			console.log('ImHere');
+			event.preventDefault();
+			$.getJSON($SCRIPT_ROOT + "/user",
+				{ username: $('input[name="username"]').val() }, 
+				UpdateStuInHtml );
+		});		
+		
+		// when reset button is clicked, resets the table to empty 	
+		$("#reset").click(function(event){
+				event.preventDefault();
+				$('#students').empty();
+  		});
+		
+		
+	   // sends the file to the route userupload		
+	   $("#uploadButton").click(UploadFile);
+	   
+	   //sends file to /missingapplication route
+	   $("#csvupload").click(FranklinFileUpload);
+      	
+	});
+
+</script>
 </head>
 
 <body>
-	{% extends "template.html" %}
-    {% block content %}
+<!--make this a pure html form without AJAX -->
+	<h2>Students without Applications Submitted</h2>
+	<form method="POST" enctype="multipart/form-data" action='/missingapplication'>
 
-	<h2> Thanks for Visiting!</h2>
-	<form id="form1" action = "http://localhost:5000/" method = "POST">
-         <p id="fname">Enter your name: </p>
-		 <input id="inputname" type = "text" name=username required autofocus>
+         <input type="file" name="franklin_file" accept=".xlsx, .csv">
+		<br>
+		<br>
+		<input type="submit" value="Click Here for To Be Contacted List">
+		<br>
+		<br>
+	</form>
+	<h2> Student Look Up</h2>
+	<form id="form1" method="POST" enctype="multipart/form-data">
+
+         <input id="select_file" type="file" name="selectfile">
+		<br>
+		<br>
+		<button id="uploadButton" type="submit" value="Upload" file>Upload File</button>
+		<br>
+		<br>
+		 <p id="fname">Enter student name: </p>
+		 <input id="inputname" type ="text" name="username" autofocus>
 		 <br>
 		 <br>
 		 <br>
-		 <p id="fname">Enter your email: </p>
-		 <input type="email" id="inputUsername" name="username" class="form-control" placeholder="Email address">
-         <br>
-		 <br>
-		 <input type="password" id="inputPassword" name="password" class="form-control" placeholder="Password">       
 		 <h2 id="new"></h2>
-		 
+		 <button id="StudentLookup">Submit</button>
 		 <br>
 		 <br>
+
 	</form>
           <div id="mytablediv">
-		  <table id="student_data" class="table table-bordered table-striped table-hover" style="width:100%">
+		  <table class="table table-bordered table-striped table-hover" style="width:100%">
+			<thead>
 			<th>Student Number</th>
 			<th>First Name</th>
 			<th>Last Name</th>
 			<th>DOB</th>
-			</tr>
+			<th>SchoolId</th>
 			</thead>
-			<tbody></tbody>
+			
+			<tbody id="students"></tbody>
 			</table>
-		  	</div>
-     
-  <br>
-  <br>
-  <br>
-  
-		<button id=reset>Reset</button>
+		  	</div>   
+  			<br>
+  			<br>
+  			<br>
+		<button id="reset">Reset</button>
 	 </div>
     </div>
-	
-	{% endblock %}
 </body>
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-	<script type=text/javascript>
-  		$SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
-	</script>
-	 <script type="text/javascript">
-      $(document).ready(function(){
-			$("#reset").click(function(event){
-			event.preventDefault();
-			var table = document.createElement("table");
-			
-			$.getJSON($SCRIPT_ROOT + "/user", {
-					username: $('input[name="username"]').val() },
-					function(data) {
-					$("#new").append('<p> Firstname: ' + data.firstname+ '</p>');
-					$("#new").append('<p> Lastname: ' + data.lastname+ '</p>')
-            				if (table !== null) {
-              			table.destroy();
-              			table = null;
-              		$("#mytable tbody").empty();
-            			}
-				 	table = $("#mytable").DataTable({
-              					data: data.my_table,
-              					columns: data.columns
-            });
-		  });
-  		});
-	  });
-	  $(document).ready(function(){
-	  	$.getJSON("df.json", function(data){
-			var student_data = ' ';
-			$.each(data, function(key, value){
-				student_data += '<tr>';
-				student_data += '<td>'+value.studentnumber+'</td>'';
-				student_data += '<td>'+value.firstname+'</td>';
-				student_data += '<td>'+value.lastname+'</td>';
-				student_data += '<td>'+value.dob+'</td>';
-				student_data += '</tr>';
-			});
-			$('#student_data').append(student_data);
-			
-		});
-	  });
-	</script>
+
 </html>
