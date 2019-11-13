@@ -6,7 +6,7 @@ import cx_Oracle
 import pandas as pd
 from pandas import ExcelFile
 from pandas import ExcelWriter
-con_str = 'psnavigator/navigate@172.21.170.234/CA528'
+con_str = 'psnavigator/navigate@xxxxxxx/xxxx'
 con = cx_Oracle.connect(con_str)
 c = con.cursor()
 
