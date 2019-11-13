@@ -1,9 +1,4 @@
 from pandas import ExcelWriter
-con_str = 'psnavigator/XXXX@XXXX/XXX'
-con = cx_Oracle.connect(con_str)
-c = con.cursor()
-
-
 app = Flask(__name__)
 
 @app.route("/")
