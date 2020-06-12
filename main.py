@@ -23,8 +23,6 @@ def home():
 def about():
 	return render_template("about.html")
 	
-"""Step 3: create a route in your python server that takes a fullname argument, splits it into first and last name and returns a response in a json format"""	
-"""Step 5: modify the python code to lookup the first and last name in the school database and return the row(s) data as json."""
 
 @app.route("/user")
 def username_first_last():
@@ -111,7 +109,6 @@ def file_upload():
 	results=pd.read_sql(query, con)
 	df1=pd.DataFrame(results)
 	
-	#df1.to_excel("C:\\Users\\julie.norris\\Documents\\Data Warehouse Analyst\\Provision2\\19-20 Support for Schools\\output.xlsx")
 		
 	return (df1.to_json(orient='records'))
 		
